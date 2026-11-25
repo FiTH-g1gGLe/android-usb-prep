@@ -13,7 +13,7 @@
 
 ## What it does
 
-Android USB Prep sets up a USB stick so your Android TV box or streaming box can read it, then copies your apps (APK files) onto it.
+Android USB Prep sets up a USB stick so your Android TV box or streaming box can read it, and puts the apps you choose (APK files) in its **Download** folder, ready to install.
 
 With one click it:
 
@@ -33,8 +33,8 @@ Go to the **[Releases page](../../releases/latest)** and download the file for y
 
 | Your computer | File to download |
 |---|---|
-| **Windows 10 / 11** | `Android.USB.Prep_1.0.0_x64-setup.exe` |
-| **Mac** (Intel or Apple Silicon) | `Android.USB.Prep_1.0.0_universal.dmg` |
+| **Windows 10 / 11** | The file ending in `x64-setup.exe` |
+| **Mac** (Intel or Apple Silicon) | The file ending in `universal.dmg` |
 
 ---
 
@@ -65,9 +65,9 @@ Go to the **[Releases page](../../releases/latest)** and download the file for y
 It will appear in the app on its own. If it doesn't, click **Refresh**.
 Click the stick to select it.
 
-**2. Add your apps (optional)**
-Drag your `.apk` files into the app, or click **Add APK files**.
-You can skip this step if you only want to format the stick.
+**2. Select your apps**
+Choose the apps you want on the stick: drag your `.apk` files into the app, or click **Select APK files**.
+These are copied into the stick's **Download** folder. You need at least one.
 
 **3. Click "Prepare USB Drive"**
 Check the name of the stick in the pop-up, then click **Erase & Prepare**.

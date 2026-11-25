@@ -294,6 +294,10 @@ fn prepare_blocking(app: &AppHandle, opts: PrepareOptions) -> Result<PrepareResu
     };
     let label = sanitize_label(&opts.label);
 
+    if opts.files.is_empty() {
+        return Err("Please select at least one app (APK file) to put on the stick.".into());
+    }
+
     let mut files: Vec<FileInfo> = Vec::new();
     for p in &opts.files {
         let path = PathBuf::from(p);
@@ -377,12 +381,8 @@ fn prepare_blocking(app: &AppHandle, opts: PrepareOptions) -> Result<PrepareResu
     if opts.copy_to_root {
         dest_dirs.push(root.clone());
     }
-    let verified = if files.is_empty() {
-        Vec::new()
-    } else {
-        emit_status(app, "copy", "Copying apps…");
-        copy::copy_and_verify(app, &files, &dest_dirs)?
-    };
+    emit_status(app, "copy", "Copying apps…");
+    let verified = copy::copy_and_verify(app, &files, &dest_dirs)?;
 
     // ---- 5. Finish -------------------------------------------------------
     emit_status(app, "finish", "Tidying up…");

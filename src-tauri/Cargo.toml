@@ -1,6 +1,6 @@
 [package]
 name = "android-usb-prep"
-version = "1.0.0"
+version = "1.0.1"
 description = "Prepare USB sticks for Android TV / OTT boxes"
 edition = "2021"
 

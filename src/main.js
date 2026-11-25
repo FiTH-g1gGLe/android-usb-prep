@@ -192,8 +192,8 @@
     if (Date.now() >= flashUntil) {
       line.classList.remove("bad");
       let t = state.files.length
-        ? `${state.files.length} app(s) · ${humanSize(p.totalFiles)}${p.copies === 2 ? " (copied twice)" : ""}`
-        : "No apps added — that's fine, the stick will still be set up.";
+        ? `${state.files.length} app(s) selected · ${humanSize(p.totalFiles)}${p.copies === 2 ? " (copied twice)" : ""}`
+        : "No apps selected yet.";
       if (p.drive) {
         const free = Math.max(0, p.usable - p.needed);
         t += ` · Free space on stick after preparing: ~${humanSize(free)}`;
@@ -252,8 +252,11 @@
     $("cap-row").classList.toggle("hidden", p.fs !== "fat32");
 
     const btn = $("btn-prepare");
-    btn.disabled = !p.drive || blocked || state.busy;
-    btn.textContent = p.drive ? "Prepare USB Drive" : "Pick a USB stick first";
+    const noApps = state.files.length === 0;
+    btn.disabled = !p.drive || noApps || blocked || state.busy;
+    btn.textContent = !p.drive ? "Pick a USB stick first"
+      : noApps ? "Select your apps first"
+      : "Prepare USB Drive";
   }
 
   function setFs(v) {
@@ -266,13 +269,13 @@
   // ---------------------------------------------------------------- confirm + run
   function askConfirm() {
     const p = plan();
-    if (!p.drive) return;
+    if (!p.drive || state.files.length === 0) return;
     $("modal-text").textContent =
       `Everything currently on '${p.drive.display}' will be erased. Continue?`;
     const fsName = p.fs === "fat32" ? "Standard (FAT32)" : "Large Files (exFAT)";
     $("modal-extra").textContent =
       `Format: ${fsName}${p.capped ? ", 32 GB partition" : ""} · Name: ${sanitizeLabel($("opt-label").value)} · ` +
-      (state.files.length ? `${state.files.length} app(s) to copy.` : "No apps to copy.");
+      `${state.files.length} app(s) will be copied to the Download folder.`;
     $("modal").classList.remove("hidden");
     $("btn-cancel").focus();
   }
@@ -324,9 +327,8 @@
   }
 
   function showDone(r) {
-    $("done-summary").textContent = r.files.length
-      ? `The stick "${r.label}" (${r.mount}) is formatted, the Android folders are created, and these apps were copied to the Download folder and checked byte-for-byte:`
-      : `The stick "${r.label}" (${r.mount}) is formatted and the Android folders are created.`;
+    $("done-summary").textContent =
+      `These apps are now in the Download folder on "${r.label}" (${r.mount}), and each one was checked to make sure it copied correctly:`;
     const ul = $("done-files");
     ul.innerHTML = "";
     for (const f of r.files) {
