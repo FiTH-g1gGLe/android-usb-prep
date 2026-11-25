@@ -1,0 +1,14 @@
+{
+  "name": "android-usb-prep",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Dead-simple USB stick prep tool for Android TV / OTT boxes",
+  "scripts": {
+    "tauri": "tauri",
+    "dev": "tauri dev",
+    "build": "tauri build"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2"
+  }
+}

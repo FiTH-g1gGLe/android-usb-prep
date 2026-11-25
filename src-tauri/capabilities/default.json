@@ -1,0 +1,15 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Everything the main window is allowed to do. Each custom Rust command is listed explicitly so nothing fails silently.",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "dialog:default",
+    "allow-app-platform",
+    "allow-list-usb-drives",
+    "allow-inspect-files",
+    "allow-prepare-usb",
+    "allow-eject-usb"
+  ]
+}

@@ -1,0 +1,55 @@
+# Builds the Windows (.msi + setup .exe) and macOS (.dmg / .app) apps on GitHub's
+# servers, so you don't need Rust or Node installed on your own computer.
+#
+# How to use: GitHub repo → Actions tab → "Build apps" → "Run workflow".
+# When it finishes, open Releases: a draft release holds all the installers.
+
+name: Build apps
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: windows-latest
+            args: ""
+          - platform: macos-latest
+            args: "--target universal-apple-darwin"
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+
+      - run: npm install
+
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: v__VERSION__
+          releaseName: "Android USB Prep v__VERSION__"
+          releaseBody: "Download the .msi or -setup.exe for Windows, or the .dmg for Mac."
+          releaseDraft: true
+          prerelease: false
+          args: ${{ matrix.args }}

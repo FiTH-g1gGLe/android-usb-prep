@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Android USB Prep</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="drop-overlay" class="drop-overlay hidden">
+    <div class="drop-box">Drop your APK files here</div>
+  </div>
+
+  <header class="app-header">
+    <div class="logo" aria-hidden="true">▣</div>
+    <div>
+      <h1>Android USB Prep</h1>
+      <p class="sub">Get a USB stick ready for your Android TV box in three easy steps.</p>
+    </div>
+  </header>
+
+  <!-- ================= MAIN SETUP SCREEN ================= -->
+  <main id="screen-setup" class="screen">
+    <!-- STEP 1 -->
+    <section class="card">
+      <div class="card-head">
+        <span class="step-num">1</span>
+        <h2>Pick your USB stick</h2>
+        <button id="btn-refresh" class="btn btn-ghost btn-small" type="button">⟳ Refresh</button>
+      </div>
+      <div id="drive-list" class="drive-list"></div>
+      <p id="drive-empty" class="empty hidden">
+        🔌 Plug your USB stick into your computer to begin.
+      </p>
+
+      <details class="advanced" id="advanced">
+        <summary>Advanced options</summary>
+        <div class="adv-body">
+          <fieldset>
+            <legend>Format type</legend>
+            <label class="radio">
+              <input type="radio" name="fs" value="fat32" checked />
+              <span><strong>Standard Compatibility (FAT32 — Recommended)</strong><br />
+                <small>Works with every Android box. Files must be under 4 GB.</small></span>
+            </label>
+            <label class="radio">
+              <input type="radio" name="fs" value="exfat" />
+              <span><strong>Large Files over 4 GB (exFAT)</strong><br />
+                <small>For huge files. Some older boxes can't read it.</small></span>
+            </label>
+          </fieldset>
+
+          <label class="check" id="cap-row">
+            <input type="checkbox" id="opt-cap" checked />
+            <span>Cap FAT32 partition at 32 GB on larger sticks
+              <small>(makes 64 GB / 128 GB sticks work on older boxes)</small></span>
+          </label>
+
+          <label class="check">
+            <input type="checkbox" id="opt-root" />
+            <span>Also copy apps to the main folder of the stick
+              <small>(for older boxes whose installer only looks there)</small></span>
+          </label>
+
+          <label class="field">
+            <span>Stick name</span>
+            <input type="text" id="opt-label" value="ANDROID_USB" maxlength="20" spellcheck="false" />
+            <small>Capital letters, numbers and _ only, max 11 characters.</small>
+          </label>
+        </div>
+      </details>
+    </section>
+
+    <!-- STEP 2 -->
+    <section class="card" id="dropzone-card">
+      <div class="card-head">
+        <span class="step-num">2</span>
+        <h2>Add apps <span class="optional">(optional)</span></h2>
+        <button id="btn-add" class="btn btn-ghost btn-small" type="button">＋ Add APK files</button>
+      </div>
+      <div id="dropzone" class="dropzone">
+        <p id="drop-hint">Drag &amp; drop <strong>.apk</strong>, <strong>.xapk</strong> or <strong>.apks</strong> files here,<br />or click <em>Add APK files</em>.</p>
+        <ul id="file-list" class="file-list"></ul>
+      </div>
+      <p id="space-line" class="space-line"></p>
+      <p id="xapk-note" class="note hidden">
+        ℹ️ .xapk and .apks files need an installer app on the box (like "SAI – Split APKs Installer").
+      </p>
+    </section>
+
+    <!-- STEP 3 -->
+    <section class="card">
+      <div class="card-head">
+        <span class="step-num">3</span>
+        <h2>Prepare the stick</h2>
+      </div>
+      <div id="warnings"></div>
+      <button id="btn-prepare" class="btn btn-primary btn-huge" type="button" disabled>
+        Prepare USB Drive
+      </button>
+      <p class="fine">This erases the stick, sets it up for Android, then copies and checks your apps.</p>
+    </section>
+  </main>
+
+  <!-- ================= PROGRESS SCREEN ================= -->
+  <main id="screen-progress" class="screen hidden">
+    <section class="card center">
+      <h2 id="progress-title">Preparing your USB stick…</h2>
+      <p class="warn-text">Please don't unplug the stick.</p>
+      <ol class="stages">
+        <li data-stage="format">Erase &amp; format</li>
+        <li data-stage="folders">Create Android folders</li>
+        <li data-stage="copy">Copy &amp; check apps</li>
+        <li data-stage="finish">Finish</li>
+      </ol>
+      <div class="bar"><div id="bar-fill" class="bar-fill"></div></div>
+      <p id="progress-text" class="progress-text">Starting…</p>
+    </section>
+  </main>
+
+  <!-- ================= SUCCESS SCREEN ================= -->
+  <main id="screen-done" class="screen hidden">
+    <section class="card center success">
+      <div class="big-check">✓</div>
+      <h2>Your USB stick is ready!</h2>
+      <p id="done-summary"></p>
+      <ul id="done-files" class="done-files"></ul>
+      <button id="btn-eject" class="btn btn-success btn-huge" type="button">Safely Eject USB</button>
+      <p id="eject-msg" class="eject-msg"></p>
+      <button id="btn-again" class="btn btn-ghost" type="button">Prepare another stick</button>
+    </section>
+  </main>
+
+  <!-- ================= ERROR SCREEN ================= -->
+  <main id="screen-error" class="screen hidden">
+    <section class="card center error">
+      <div class="big-x">!</div>
+      <h2>Something went wrong</h2>
+      <p id="error-text"></p>
+      <button id="btn-back" class="btn btn-primary" type="button">Back</button>
+    </section>
+  </main>
+
+  <!-- ================= CONFIRM MODAL ================= -->
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-box">
+      <h2>⚠️ Erase this USB stick?</h2>
+      <p id="modal-text"></p>
+      <p id="modal-extra" class="small"></p>
+      <div class="modal-actions">
+        <button id="btn-cancel" class="btn btn-ghost" type="button">Cancel</button>
+        <button id="btn-confirm" class="btn btn-danger" type="button">Erase &amp; Prepare</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>
